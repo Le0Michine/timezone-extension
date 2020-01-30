@@ -71,7 +71,7 @@ module.exports = function (options) {
       modules: [helpers.root("src"), "node_modules"]
     },
     module: {
-      loaders: [
+      rules: [
         {
           test: /\.tsx?$/,
           loaders: "awesome-typescript-loader",
@@ -82,8 +82,8 @@ module.exports = function (options) {
           exclude: /node_modules/,
           loader: "babel-loader",
           query: {
-            presets: ["react", "es2015", "stage-0"],
-            plugins: ["react-html-attrs", "transform-decorators-legacy", "transform-class-properties"],
+            presets: ["react", "env"],
+            plugins: ["react-html-attrs"],
           }
         },
         {
@@ -114,10 +114,6 @@ module.exports = function (options) {
             "style-loader",
             "css-loader?modules&importLoaders=1&localIdentName=[name]__[local]___[hash:base64:5]"
           ]
-        },
-        {
-          test: /\.json$/,
-          loader: "json-loader"
         },
         {
           test: /\.html$/,

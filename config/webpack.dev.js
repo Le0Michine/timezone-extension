@@ -1,4 +1,5 @@
 const webpackMerge = require("webpack-merge");
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const commonConfig = require("./webpack.common.js"); // the settings that are common to prod and dev
 const webpack = require("webpack");
 
@@ -19,6 +20,7 @@ const webpackOptions = {
 module.exports = (function(env) {
     webpackOptions.cleanOutput = env.clean === "true";
     return webpackMerge(commonConfig(webpackOptions), {
+        mode: "development",
         devtool: "cheap-module-source-map",
         plugins: [
             new webpack.DefinePlugin({
@@ -26,6 +28,7 @@ module.exports = (function(env) {
                     "NODE_ENV": `"${ENV}"`
                 }
             }),
+            ...((process.argv || []).includes("--profile-bundle") ? [new BundleAnalyzerPlugin()] : []),
         ]
     });
 });

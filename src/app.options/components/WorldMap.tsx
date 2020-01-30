@@ -1,5 +1,6 @@
 import * as d3 from "d3";
-import * as _ from "lodash";
+import map from "lodash-es/map";
+import minBy from "lodash-es/minBy";
 import { Color } from "material-ui";
 import Paper from "material-ui/Paper";
 import { Theme, withStyles } from "material-ui/styles";
@@ -47,11 +48,11 @@ class WorldMapImpl extends React.Component<WorldMapProps, WorldMapState> {
     const [x, y] = guessedZoneMeta
       ? projection([guessedZoneMeta.long, guessedZoneMeta.lat])
       : [0, 0];
-    const points = _.chain(timezoneMeta.zones).map((zone: any) => {
+    const points = map(timezoneMeta.zones, (zone: any) => {
       const [x, y] = projection([zone.long, zone.lat])
       const { name } = zone;
       return { x, y, name }
-    }).filter(x => Boolean(moment.tz.zone(x.name))).value();
+    }).filter(x => Boolean(moment.tz.zone(x.name)));
     this.points = points;
     this.state = {
       pointerX: x,
@@ -133,10 +134,10 @@ class WorldMapImpl extends React.Component<WorldMapProps, WorldMapState> {
     const { width: mapWidth, height: mapHeight, top, left } = currentTarget.getBoundingClientRect();
     const mouseX = clientX - left;
     const mouseY = clientY - top;
-    const minDistance = _.chain(this.points).map(x => ({
+    const minDistance = minBy(this.points.map(x => ({
       point: x,
       distance: this.getEuclideanDistance([x.x, x.y], [mouseX, mouseY])
-    })).minBy("distance").value();
+    })), "distance");
     this.setState({
       pointerX: minDistance.point.x,
       pointerY: minDistance.point.y,
@@ -153,7 +154,7 @@ class WorldMapImpl extends React.Component<WorldMapProps, WorldMapState> {
     const { classes, use24TimeFormat } = this.props;
     const { width, height } = this.mapSize;
     const { mouseHover } = this.state;
-    const selectedPoint = !this.state.mouseHover && this.props.timeZoneId
+    const selectedPoint = !mouseHover && this.props.timeZoneId
       ? this.props.timeZoneId
       : this.state.selectedPoint;
     const { x: pointerX, y: pointerY } = this.getSelectedTimeZonePosition(selectedPoint);
